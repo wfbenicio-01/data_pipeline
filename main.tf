@@ -1,5 +1,64 @@
 
 terraform {
+  backend "s3" {
+    bucket         = "infra-tf-state"
+    key            = "terraform.tfstate"
+    region         = "sa-east-1"
+    dynamodb_table = "terraform-lock"
+    encrypt        = true
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+resource "aws_s3_bucket" "bronze" {
+  bucket = "${var.name_prefix}-bronze"
+}
+
+resource "aws_s3_bucket" "gold" {
+  bucket = "${var.name_prefix}-gold"
+}
+
+resource "aws_sqs_queue" "fallback" {
+  name = "${var.name_prefix}-fallback-queue"
+}
+
+resource "aws_iam_role" "step_function_role" {
+  name = "${var.name_prefix}-step-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "states.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_sfn_state_machine" "ingest" {
+  name     = "${var.name_prefix}-ingest"
+  role_arn = aws_iam_role.step_function_role.arn
+  definition = jsonencode({
+    Comment = "Ingest step",
+    StartAt = "PassState",
+    States = {
+      PassState = {
+        Type = "Pass",
+        End  = true
+      }
+    }
+  })
+}
+
+
+
+terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"

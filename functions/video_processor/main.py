@@ -1,3 +1,11 @@
-# video_processor
+import json
+
 def lambda_handler(event, context):
-    return {'function': 'video_processor', 'status': 'ok'}
+    s3_path = event.get("s3_path", "")
+    # Simulando extração de áudio de vídeo
+    return {
+        "function": "video_processor",
+        "s3_path": s3_path,
+        "audio_extracted": True,
+        "transcription": "Simulated transcription of video audio"
+    }

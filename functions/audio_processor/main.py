@@ -1,3 +1,10 @@
-# audio_processor
+import json
+
 def lambda_handler(event, context):
-    return {'function': 'audio_processor', 'status': 'ok'}
+    s3_path = event.get("s3_path", "")
+    # Simulando transcrição de áudio
+    return {
+        "function": "audio_processor",
+        "s3_path": s3_path,
+        "transcription": "Simulated transcription of audio"
+    }

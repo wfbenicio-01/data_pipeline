@@ -1,3 +1,11 @@
-# text_processor
+import hashlib
+import json
+
 def lambda_handler(event, context):
-    return {'function': 'text_processor', 'status': 'ok'}
+    text = event.get("text", "")
+    embedding = hashlib.sha256(text.encode()).hexdigest()
+    return {
+        "function": "text_processor",
+        "embedding_simulation": embedding[:32],
+        "length": len(text)
+    }
