@@ -111,3 +111,12 @@ resource "aws_lambda_function" "detect_file" {
   s3_key        = aws_s3_object.detect_zip.key
   source_code_hash = filebase64sha256("deploy/detect_file.zip")
 }
+
+
+resource "aws_s3_bucket" "bronze" {
+  bucket = "${var.name_prefix}-bronze"
+}
+
+resource "aws_s3_bucket" "gold" {
+  bucket = "${var.name_prefix}-gold"
+}
