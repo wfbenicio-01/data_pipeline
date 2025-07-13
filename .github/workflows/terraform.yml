@@ -1,0 +1,39 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: sa-east-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: |
+          terraform init -backend-config="bucket=infra-tf-state-${{ secrets.NAME_PREFIX }}"                          -backend-config="key=global/terraform.tfstate"                          -backend-config="region=${{ env.AWS_REGION }}"
+
+      - name: Terraform Format & Validate
+        run: |
+          terraform fmt -check
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          terraform plan -var-file=env/${{ github.event.inputs.env || 'dev' }}.tfvars -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: |
+          terraform apply -auto-approve tfplan

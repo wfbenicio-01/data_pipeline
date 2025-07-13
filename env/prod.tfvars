@@ -1,0 +1,8 @@
+region = "sa-east-1"
+name_prefix = "myproject-prod"
+fallback_subnet_id = "subnet-yyyyyyyy"
+size_threshold = 10485760
+opensearch_host = "search-domain.us-east-1.es.amazonaws.com"
+opensearch_index = "rag-index"
+opensearch_user = "admin"
+opensearch_pass = "changeme"

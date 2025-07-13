@@ -1,0 +1,4 @@
+whisper
+moviepy
+sentence-transformers
+opensearch-py

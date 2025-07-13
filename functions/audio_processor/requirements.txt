@@ -1,0 +1,3 @@
+whisper
+sentence-transformers
+opensearch-py
