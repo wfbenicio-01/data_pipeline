@@ -22,16 +22,24 @@ jobs:
 
       - name: Terraform Init
         run: |
-          terraform init -backend-config="bucket=infra-tf-state-${{ secrets.NAME_PREFIX }}"                          -backend-config="key=global/terraform.tfstate"                          -backend-config="region=${{ env.AWS_REGION }}"
+          terraform init \
+            -backend-config="bucket=infra-tf-state-${{ secrets.NAME_PREFIX }}" \
+            -backend-config="key=global/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}"
+
+      - name: Terraform Auto-format
+        run: terraform fmt -recursive
 
       - name: Terraform Format & Validate
         run: |
-          terraform fmt -check
+          terraform fmt -recursive -check
           terraform validate
 
       - name: Terraform Plan
         run: |
-          terraform plan -var-file=env/${{ github.event.inputs.env || 'dev' }}.tfvars -out=tfplan
+          terraform plan \
+            -var-file=env/${{ github.event.inputs.env || 'dev' }}.tfvars \
+            -out=tfplan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
